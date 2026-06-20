@@ -13,14 +13,13 @@
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--fundo); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         
-        /* Container Responsivo */
         .container { width: 100%; max-width: 450px; background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); box-sizing: border-box; }
         
         .logo { width: 140px; display: block; margin: 0 auto 20px; }
         h2 { color: var(--roxo); text-align: center; margin-bottom: 20px; font-size: 22px; }
         
         label { display: block; margin-top: 15px; font-weight: 600; color: var(--roxo); font-size: 14px; }
-        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; /* 16px evita zoom automático no iOS */ }
+        input, select { width: 100%; padding: 14px; margin-top: 5px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
         
         .tempo-container { display: flex; gap: 10px; }
         .tempo-container > div:first-child { flex: 2; }
@@ -29,13 +28,14 @@
         button { width: 100%; padding: 18px; background: var(--roxo); color: white; border: none; border-radius: 12px; margin-top: 25px; font-size: 17px; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
         button:active { transform: scale(0.98); }
         
+        /* Seção explicativa */
+        details { margin-top: 20px; color: var(--roxo); font-size: 13px; border: 1px solid #eee; padding: 12px; border-radius: 12px; }
+        summary { font-weight: bold; cursor: pointer; outline: none; }
+
         .resultado { margin-top: 25px; padding: 20px; border: 2px solid var(--roxo); border-radius: 15px; text-align: center; display: none; }
         .valor { font-size: 32px; font-weight: bold; color: var(--roxo); margin-top: 5px; }
 
-        /* Ajuste para Desktop */
-        @media (min-width: 768px) {
-            .container { max-width: 500px; padding: 40px; }
-        }
+        @media (min-width: 768px) { .container { max-width: 500px; padding: 40px; } }
     </style>
 </head>
 <body>
@@ -70,6 +70,20 @@
 
     <button onclick="calcular()">Calcular Preço</button>
 
+    <details>
+        <summary>Como é feito o cálculo?</summary>
+        <div style="margin-top: 10px; line-height: 1.5;">
+            <p><strong>Impressora:</strong> Flashforge AD5X</p>
+            <p><strong>Custos considerados:</strong></p>
+            <ul>
+                <li><strong>Material:</strong> (Peso ÷ 1000) × Preço do Kg.</li>
+                <li><strong>Energia:</strong> Custo médio de R$ 0,20/h.</li>
+                <li><strong>Depreciação:</strong> Valor de uso da máquina de R$ 0,40/h.</li>
+                <li><strong>Margem:</strong> Valor extra aplicado sobre o custo total.</li>
+            </ul>
+        </div>
+    </details>
+
     <div class="resultado" id="resultadoArea">
         <p style="margin:0; font-size: 14px; color: var(--roxo);">Sugestão de venda:</p>
         <div class="valor" id="valorFinal">R$ 0,00</div>
@@ -87,8 +101,10 @@
         if(!peso || !tempoInput) { alert("Por favor, preencha o peso e o tempo!"); return; }
 
         const tempoHoras = (unidade === 60) ? (tempoInput / 60) : tempoInput;
-        const custoEnergiaHora = 0.20;
-        const depreciacaoHora = 0.40;
+        
+        // Custos configurados para a AD5X
+        const custoEnergiaHora = 0.20; 
+        const depreciacaoHora = 0.40;  
         
         const custoMaterial = (peso / 1000) * precoKg;
         const custoOperacional = tempoHoras * (custoEnergiaHora + depreciacaoHora);
