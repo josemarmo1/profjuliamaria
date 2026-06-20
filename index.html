@@ -3,70 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Precificador | Ateliê 3D</title>
+    <title>Ateliê 3D | Precificação</title>
     <style>
         :root {
+            --roxo: #6a4c93;
             --rosa: #ff7e9f;
             --verde: #4dcbb9;
-            --roxo: #6a4c93;
-            --fundo: #faf7f9;
+            --fundo: #fdfafb;
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--fundo); color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        h2 { color: var(--roxo); text-align: center; }
-        label { display: block; margin-top: 10px; font-weight: bold; color: var(--roxo); }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: var(--verde); color: white; border: none; border-radius: 10px; margin-top: 20px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .resultado { margin-top: 20px; padding: 15px; background: #f0fdfa; border: 2px solid var(--verde); border-radius: 10px; text-align: center; }
-        .footer-stats { display: flex; justify-content: space-between; margin-top: 20px; font-size: 12px; color: #666; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--fundo); padding: 20px; }
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .logo { width: 120px; display: block; margin: 0 auto 20px; }
+        h2 { color: var(--roxo); text-align: center; margin-bottom: 20px; }
+        label { display: block; margin-top: 15px; font-weight: 600; color: var(--roxo); font-size: 14px; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; }
+        .tempo-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { width: 100%; padding: 16px; background: var(--roxo); color: white; border: none; border-radius: 12px; margin-top: 25px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: var(--rosa); }
+        .resultado { margin-top: 25px; padding: 20px; background: #fdfafb; border: 2px solid var(--roxo); border-radius: 15px; text-align: center; }
+        .valor { font-size: 28px; font-weight: bold; color: var(--roxo); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Ateliê 3D - Precificação</h2>
+    <img src="logo.png" class="logo" alt="Logo Ateliê 3D">
+    
+    <h2>Precificador</h2>
     
     <label>Peso da peça (g)</label>
     <input type="number" id="peso" placeholder="Ex: 50">
     
-    <label>Tempo de impressão (h)</label>
-    <input type="number" id="horas" placeholder="Ex: 4">
+    <div class="tempo-container">
+        <div>
+            <label>Tempo</label>
+            <input type="number" id="tempo" placeholder="Valor">
+        </div>
+        <div>
+            <label>Unidade</label>
+            <select id="unidade">
+                <option value="1">Horas</option>
+                <option value="60">Minutos</option>
+            </select>
+        </div>
+    </div>
     
     <label>Custo do Filamento (R$/kg)</label>
     <input type="number" id="custoFilamento" value="120">
     
     <label>Margem de Lucro (%)</label>
-    <input type="number" id="margem" value="50">
+    <input type="number" id="margem" value="300">
 
-    <button onclick="calcular()">Calcular Preço Final</button>
+    <button onclick="calcular()">Calcular Preço</button>
 
     <div class="resultado" id="resultadoArea" style="display:none;">
-        <h3 id="valorFinal">R$ 0,00</h3>
-        <p style="font-size: 12px;">Sugestão de venda</p>
-    </div>
-
-    <div class="footer-stats">
-        <span>Energia (estimada): R$ 0.15/h</span>
-        <span>Depreciação: R$ 0.10/h</span>
+        <p style="margin:0; font-size: 14px;">Sugestão de venda:</p>
+        <div class="valor" id="valorFinal">R$ 0,00</div>
     </div>
 </div>
 
 <script>
     function calcular() {
-        // Valores base da AD5X
-        const custoEnergiaHora = 0.15;
-        const depreciacaoHora = 0.10;
-        
         const peso = parseFloat(document.getElementById('peso').value);
-        const horas = parseFloat(document.getElementById('horas').value);
+        const tempoInput = parseFloat(document.getElementById('tempo').value);
+        const unidade = parseFloat(document.getElementById('unidade').value);
         const precoKg = parseFloat(document.getElementById('custoFilamento').value);
         const margem = parseFloat(document.getElementById('margem').value) / 100;
 
-        const custoMaterial = (peso / 1000) * precoKg;
-        const custoOperacional = horas * (custoEnergiaHora + depreciacaoHora);
-        const custoTotal = custoMaterial + custoOperacional;
+        // Converter tempo para horas (se for minutos, divide por 60)
+        const tempoHoras = (unidade === 60) ? (tempoInput / 60) : tempoInput;
+
+        const custoEnergiaHora = 0.20; // Ajustado
+        const depreciacaoHora = 0.40;  // Ajustado
         
-        const precoFinal = custoTotal * (1 + margem);
+        const custoMaterial = (peso / 1000) * precoKg;
+        const custoOperacional = tempoHoras * (custoEnergiaHora + depreciacaoHora);
+        const precoFinal = (custoMaterial + custoOperacional) * (1 + margem);
 
         document.getElementById('resultadoArea').style.display = 'block';
         document.getElementById('valorFinal').innerText = "R$ " + precoFinal.toFixed(2).replace('.', ',');
