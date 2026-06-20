@@ -16,6 +16,11 @@
         .tempo-container > div:first-child { flex: 2; }
         .tempo-container > div:last-child { flex: 1; }
         button { width: 100%; padding: 18px; background: var(--roxo); color: white; border: none; border-radius: 12px; margin-top: 25px; font-size: 17px; font-weight: bold; cursor: pointer; }
+        
+        /* Explicação */
+        details { margin-top: 25px; color: var(--roxo); font-size: 13px; border: 1px solid #eee; padding: 12px; border-radius: 12px; }
+        summary { font-weight: bold; cursor: pointer; }
+        
         .resultado { margin-top: 25px; padding: 20px; border: 2px solid var(--roxo); border-radius: 15px; text-align: center; display: none; }
         .valor { font-size: 32px; font-weight: bold; color: var(--roxo); margin-top: 5px; }
     </style>
@@ -38,13 +43,30 @@
     <label>Custo do Filamento (R$/kg)</label>
     <input type="number" id="custoFilamento" value="120" inputmode="decimal">
     
-    <label>Custo Energia (R$/h)</label>
-    <input type="number" id="custoEnergia" value="0.20" step="0.01" inputmode="decimal">
+    <label>Bandeira Tarifária (Energia)</label>
+    <select id="bandeira">
+        <option value="0.20">Verde (Normal)</option>
+        <option value="0.25">Amarela (+ Taxa)</option>
+        <option value="0.30">Vermelha (Custo Alto)</option>
+    </select>
     
     <label>Margem de Lucro (%)</label>
     <input type="number" id="margem" value="300" inputmode="decimal">
 
     <button onclick="calcular()">Calcular Preço</button>
+
+    <details>
+        <summary>Como o preço é calculado?</summary>
+        <div style="margin-top: 10px; line-height: 1.6;">
+            <p><strong>Impressora:</strong> Flashforge AD5X</p>
+            <ul>
+                <li><strong>Material:</strong> Baseado no peso (g) e valor do filamento.</li>
+                <li><strong>Energia:</strong> Calculada pelo tempo de uso e a bandeira tarifária atual da sua região (Verde/Amarela/Vermelha). A bandeira vermelha aumenta o custo da hora, pois reflete o custo extra da energia no país.</li>
+                <li><strong>Depreciação:</strong> Valor fixo de desgaste da máquina (R$ 0,40/h).</li>
+                <li><strong>Markup:</strong> Sua margem de lucro aplicada sobre o custo total.</li>
+            </ul>
+        </div>
+    </details>
 
     <div class="resultado" id="resultadoArea">
         <p style="margin:0; font-size: 14px; color: var(--roxo);">Sugestão de venda:</p>
@@ -58,9 +80,9 @@
         const tempoInput = parseFloat(document.getElementById('tempo').value);
         const unidade = parseFloat(document.getElementById('unidade').value);
         const precoKg = parseFloat(document.getElementById('custoFilamento').value);
-        const custoEnergiaHora = parseFloat(document.getElementById('custoEnergia').value);
+        const custoEnergiaHora = parseFloat(document.getElementById('bandeira').value);
         const margem = parseFloat(document.getElementById('margem').value) / 100;
-        const depreciacaoHora = 0.40; // Valor fixo de desgaste da máquina
+        const depreciacaoHora = 0.40;
         
         const tempoHoras = (unidade === 60) ? (tempoInput / 60) : tempoInput;
         const custoMaterial = (peso / 1000) * precoKg;
